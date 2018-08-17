@@ -1,7 +1,11 @@
 package net.riminder.riminder;
 
 import com.sun.jersey.api.client.Client;
+
+import net.riminder.riminder.route.Filter;
+import net.riminder.riminder.route.Profile;
 import net.riminder.riminder.route.Source;
+import net.riminder.riminder.route.Webhooks;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,6 +25,9 @@ public class Riminder {
     private RestClientW rclient;
 
     private Source source;
+    private Filter filter;
+    private Profile profile;
+    private Webhooks webhooks;
 
 
 
@@ -55,10 +62,28 @@ public class Riminder {
         this.rclient = new RestClientW(this.client, this.base_uri, this.headers);
 
         this.source = new Source(this.rclient);
+        this.filter = new Filter(this.rclient);
+        this.profile = new Profile(this.rclient);
+        this.webhooks = new Webhooks(this.rclient, this.webhook_secret);
     }
 
-    public Source getSource()
+    public Source Source()
     {
         return this.source;
+    }
+
+    public Filter Filter()
+    {
+        return this.filter;
+    }
+
+    public Profile Profile()
+    {
+        return this.profile;
+    }
+
+    public Webhooks Webhooks()
+    {
+        return this.webhooks;
     }
 }

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import net.riminder.riminder.exp.RiminderException;
 import net.riminder.riminder.exp.RiminderResponseCastException;
 import net.riminder.riminder.exp.RiminderResponseException;
 import net.riminder.riminder.exp.RiminderTransferException;
@@ -28,21 +29,17 @@ public class App
             lol = lodddddl;
         }
     }
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+    public static void main( String[] args ) {
+        System.out.println("Hello World!");
 
-        Riminder api = new Riminder("ask_4b7fa33174a7113fbd16d806dbd21c07");
+        Riminder api = new Riminder("ask_110bf53876034bf0546b693d1a07a515");
         try {
-            Map<String, Token> tmp = api.getSource().list();
-            Token tmp2 = tmp.get("data");
-            List<Token> tmp3 = tmp2.getList();
-            System.out.println(tmp3);
-        } catch (RiminderTransferException e) {
-            e.printStackTrace();
-        } catch (RiminderResponseException e) {
-            e.printStackTrace();
-        } catch (RiminderResponseCastException e) {
+            Map<String, Token> tmp = api.Profile().Stage().set("fe6d7a2aa9125259a5ecf7905154a0396a891c06", 
+                new Ident.ID(Ident.Profile, "91b2efbde125bf179a6db4ea5ad4dca3c4ee04d4"),
+                new Ident.Reference(Ident.Filter, "dddd"),
+                Constants.Stage.NEW);
+            System.out.println(tmp);
+        } catch (RiminderException e) {
             e.printStackTrace();
         }
     }

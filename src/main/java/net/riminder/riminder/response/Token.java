@@ -18,28 +18,30 @@ public class Token {
     @Override
     public String toString()
     {
+        if (value == null)
+            return null;
         return value.toString();
     }
 
-    public <T> T get() throws RiminderResponseCastException
+    public <T> T getAs() throws RiminderResponseCastException
     {
         try
         {
             return (T)value;
         }catch (ClassCastException e)
         {
-            throw new RiminderResponseCastException("Can't get response value element: invalid type.", e);
+            throw new RiminderResponseCastException("Can't getAs response value element: invalid type.", e);
         }
     }
 
-    public Map<String, Token> getMap() throws RiminderResponseCastException
+    public Map<String, Token> getAsMap() throws RiminderResponseCastException
     {
-        return this.get();
+        return this.getAs();
     }
 
-    public List<Token> getList() throws RiminderResponseCastException
+    public List<Token> getAsList() throws RiminderResponseCastException
     {
-        return this.get();
+        return this.getAs();
     }
 
     private static Token responseValueToToken(Object obj)

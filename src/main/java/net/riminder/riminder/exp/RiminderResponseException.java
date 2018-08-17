@@ -9,16 +9,16 @@ import java.util.Map;
 
 public class RiminderResponseException extends RiminderException {
 
-    public int statusCode;
+    private static final long serialVersionUID = 1L;
+	public int statusCode;
     public String reason;
     public String apiMessage;
     public ClientResponse response;
 
 
-    private static  String PrepareMessage(UniformInterfaceException exp)
+    private static  String PrepareMessage(ClientResponse response)
     {
         Gson gson = new Gson();
-        ClientResponse response = exp.getResponse();
         int statusCode = response.getStatusInfo().getStatusCode();
         String reason = response.getStatusInfo().getReasonPhrase();
         String apiMessage = "...";
@@ -37,9 +37,28 @@ public class RiminderResponseException extends RiminderException {
 
     public RiminderResponseException(UniformInterfaceException exp) {
 
-        super(PrepareMessage(exp));
+        super(PrepareMessage(exp.getResponse()), exp);
         Gson gson = new Gson();
         response = exp.getResponse();
+        this.statusCode = response.getStatusInfo().getStatusCode();
+        this.reason = response.getStatusInfo().getReasonPhrase();
+        this.apiMessage = "...";
+
+        try {
+            Map<String, Object> mapResponse = new HashMap<String, Object>();
+            mapResponse = gson.fromJson(response.getEntity(String.class), mapResponse.getClass());
+            this.apiMessage = mapResponse.get("message").toString();
+        }catch (Exception e)
+        {
+            this.apiMessage = "Cannot parse api message: " + e.toString();
+        }
+    }
+
+    public RiminderResponseException(ClientResponse resp) {
+
+        super(PrepareMessage(resp));
+        Gson gson = new Gson();
+        response = resp;
         this.statusCode = response.getStatusInfo().getStatusCode();
         this.reason = response.getStatusInfo().getReasonPhrase();
         this.apiMessage = "...";
