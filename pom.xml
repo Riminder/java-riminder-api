@@ -25,19 +25,28 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
-      <!-- https://mvnrepository.com/artifact/com.sun.jersey/jersey-client -->
-      <dependency>
-          <groupId>com.sun.jersey</groupId>
-          <artifactId>jersey-client</artifactId>
-          <version>1.19.4</version>
-      </dependency>
-
-      <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+      
+    <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.8.5</version>
     </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+    <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>4.5.6</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime -->
+    <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpmime</artifactId>
+        <version>4.5.6</version>
+    </dependency>
+
+
 
   </dependencies>
 

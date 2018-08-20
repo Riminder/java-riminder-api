@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import net.riminder.riminder.Constants;
 import net.riminder.riminder.Ident;
 import net.riminder.riminder.RestClientW;
+import net.riminder.riminder.exp.RiminderException;
 import net.riminder.riminder.exp.RiminderResponseCastException;
 import net.riminder.riminder.exp.RiminderResponseException;
 import net.riminder.riminder.exp.RiminderTransferException;
@@ -110,7 +111,7 @@ public class Profile {
 
 
 
-    public Map<String, Token> list(Listoptions options) throws RiminderResponseCastException, RiminderResponseException, RiminderTransferException
+    public Map<String, Token> list(Listoptions options) throws RiminderException
     {
         Gson gson = new Gson();
         Date date = new Date();
@@ -123,18 +124,18 @@ public class Profile {
         query = RestClientW.add_with_default(query, "filter_reference", options.filter_reference, null, false);
         query = RestClientW.add_with_default(query, options.filter_ident.getName(), options.filter_ident.getValue(), null, false);
         query = RestClientW.add_with_default(query, "stage", options.stage, null, false);
-        query = RestClientW.add_with_default(query, "rating", options.rating.toString(), null, false);
-        query = RestClientW.add_with_default(query, "date_start", options.date_start.toString(), DEFAULT_DATE_START, false);
-        query = RestClientW.add_with_default(query, "date_end", options.date_end.toString(), new Long(date.getTime()).toString(), false);
-        query = RestClientW.add_with_default(query, "page", options.page.toString(), null, false);
-        query = RestClientW.add_with_default(query, "limit", options.limit.toString(), null, false);
-        query = RestClientW.add_with_default(query, "sort_by", options.sort_by.toString(), null, false);
-        query = RestClientW.add_with_default(query, "order_by", options.order_by.toString(), null, false);
+        query = RestClientW.add_with_defaultso(query, "rating", options.rating, null, false);
+        query = RestClientW.add_with_defaultso(query, "date_start", options.date_start, DEFAULT_DATE_START, false);
+        query = RestClientW.add_with_defaultso(query, "date_end", options.date_end, new Long(date.getTime()).toString(), false);
+        query = RestClientW.add_with_defaultso(query, "page", options.page, null, false);
+        query = RestClientW.add_with_defaultso(query, "limit", options.limit, null, false);
+        query = RestClientW.add_with_default(query, "sort_by", options.sort_by, Constants.SortBy.RANKING, false);
+        query = RestClientW.add_with_default(query, "order_by", options.order_by, null, false);
 
         return rclient.get("profiles", query).get("data").getAsMap();
     }
 
-    public Map<String, Token> add(String source_id, String filepath, String profile_reference, Long timestamp_reception, List<TrainingMetadata> training_metadatas) throws RiminderResponseCastException, RiminderResponseException, RiminderTransferException
+    public Map<String, Token> add(String source_id, String filepath, String profile_reference, Long timestamp_reception, List<TrainingMetadata> training_metadatas) throws RiminderException
     {
         Map<String, Object> bodyparams = new HashMap<>();
 
@@ -146,7 +147,7 @@ public class Profile {
         return rclient.postfile("profile", bodyparams, filepath).get("data").getAsMap();
     }
 
-    public Map<String, Token> get(String source_id, Ident profile_ident) throws RiminderResponseCastException, RiminderResponseException, RiminderTransferException
+    public Map<String, Token> get(String source_id, Ident profile_ident) throws RiminderException
     {
         Map<String, String> query = new HashMap<>();
 
@@ -165,7 +166,7 @@ public class Profile {
             this.rclient = rclient;
         }
 
-        public List<Token> list(String source_id, Ident profile_ident) throws RiminderResponseCastException, RiminderResponseException, RiminderTransferException
+        public List<Token> list(String source_id, Ident profile_ident) throws RiminderException
         {
             Map<String, String> query = new HashMap<>();
 
@@ -183,7 +184,7 @@ public class Profile {
             this.rclient = rclient;
         }
 
-        public Map<String, Token> get(String source_id, Ident profile_ident) throws RiminderResponseCastException, RiminderResponseException, RiminderTransferException {
+        public Map<String, Token> get(String source_id, Ident profile_ident) throws RiminderException {
             Map<String, String> query = new HashMap<>();
 
             query.put("source_id", source_id);
@@ -200,7 +201,7 @@ public class Profile {
             this.rclient = rclient;
         }
 
-        public List<Token> list(String source_id, Ident profile_ident) throws RiminderResponseCastException, RiminderResponseException, RiminderTransferException {
+        public List<Token> list(String source_id, Ident profile_ident) throws RiminderException {
             Map<String, String> query = new HashMap<>();
 
             query.put("source_id", source_id);
@@ -270,7 +271,7 @@ public class Profile {
             public Urls urls = new Urls();
         }
         
-        public Map<String, Token> check(ProfileJson profile_data, List<TrainingMetadata> training_metadatas) throws RiminderResponseCastException, RiminderResponseException, RiminderTransferException
+        public Map<String, Token> check(ProfileJson profile_data, List<TrainingMetadata> training_metadatas) throws RiminderResponseCastException, RiminderException 
         {
             Map<String, Object> bodyparams = new HashMap<>();
 
@@ -280,7 +281,7 @@ public class Profile {
             return rclient.post("profile/json/check", bodyparams).get("data").getAsMap();
         }
 
-        public Map<String, Token> add(String source_id, ProfileJson profile_data, String profile_reference, Long timestamp_reception, List<TrainingMetadata> training_metadatas) throws RiminderResponseCastException, RiminderResponseException, RiminderTransferException {
+        public Map<String, Token> add(String source_id, ProfileJson profile_data, String profile_reference, Long timestamp_reception, List<TrainingMetadata> training_metadatas) throws RiminderException {
             Map<String, Object> bodyparams = new HashMap<>();
 
             bodyparams.put("source_id", source_id);
@@ -301,16 +302,16 @@ public class Profile {
             this.rclient = rclient;
         }
 
-        public Map<String, Token> set(String source_id, Ident profile_ident, Ident filter_ident, String stage) throws RiminderResponseCastException, RiminderResponseException, RiminderTransferException
+        public Map<String, Token> set(String source_id, Ident profile_ident, Ident filter_ident, String stage) throws RiminderException
         {
             Map<String, Object> bodyparams = new HashMap<>();
 
             bodyparams.put("source_id", source_id);
             bodyparams.put(profile_ident.getName(), profile_ident.getValue());
-            bodyparams.put(profile_ident.getName(), profile_ident.getValue());
+            bodyparams.put(filter_ident.getName(), filter_ident.getValue());
             bodyparams.put("stage", stage);
 
-            return rclient.post("profile/stage", bodyparams).get("data").getAsMap();
+            return rclient.patch("profile/stage", bodyparams).get("data").getAsMap();
         }
     }
 
@@ -321,15 +322,15 @@ public class Profile {
             this.rclient = rclient;
         }
 
-        public Map<String, Token> set(String source_id, Ident profile_ident, Ident filter_ident, String rating) throws RiminderResponseCastException, RiminderResponseException, RiminderTransferException {
+        public Map<String, Token> set(String source_id, Ident profile_ident, Ident filter_ident, int rating) throws RiminderException {
             Map<String, Object> bodyparams = new HashMap<>();
 
             bodyparams.put("source_id", source_id);
             bodyparams.put(profile_ident.getName(), profile_ident.getValue());
-            bodyparams.put(profile_ident.getName(), profile_ident.getValue());
+            bodyparams.put(filter_ident.getName(), filter_ident.getValue());
             bodyparams.put("rating", rating);
 
-            return rclient.post("profile/rating", bodyparams).get("data").getAsMap();
+            return rclient.patch("profile/rating", bodyparams).get("data").getAsMap();
         }
     }
 

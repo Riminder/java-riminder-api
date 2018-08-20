@@ -1,6 +1,5 @@
 package net.riminder.riminder;
 
-import com.sun.jersey.api.client.Client;
 
 import net.riminder.riminder.route.Filter;
 import net.riminder.riminder.route.Profile;
@@ -8,7 +7,6 @@ import net.riminder.riminder.route.Source;
 import net.riminder.riminder.route.Webhooks;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 public class Riminder {
@@ -21,7 +19,6 @@ public class Riminder {
     private String base_uri;
     private String webhook_secret;
     private String api_secret;
-    private Client client;
     private RestClientW rclient;
 
     private Source source;
@@ -58,8 +55,7 @@ public class Riminder {
         this.headers = new HashMap<>();
         this.headers.put("X-API-KEY", this.api_secret);
 
-        this.client = new Client();
-        this.rclient = new RestClientW(this.client, this.base_uri, this.headers);
+        this.rclient = new RestClientW(this.base_uri, this.headers);
 
         this.source = new Source(this.rclient);
         this.filter = new Filter(this.rclient);

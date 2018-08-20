@@ -1,147 +1,248 @@
 package net.riminder.riminder;
 
 import com.google.gson.Gson;
-import com.sun.jersey.api.client.*;
+
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.FileEntity;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
+
+import net.riminder.riminder.exp.RiminderArgumentException;
+import net.riminder.riminder.exp.RiminderException;
+import net.riminder.riminder.exp.RiminderRequestException;
 import net.riminder.riminder.exp.RiminderResponseException;
 import net.riminder.riminder.exp.RiminderTransferException;
 import net.riminder.riminder.response.Token;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RestClientW {
 
-    private Client client;
+    private HttpClient client;
     private String base_url;
     private Map<String, Object> default_headers;
     private Gson gson;
 
-    public RestClientW(Client client, String base_url, Map<String, Object> default_headers)
+    private static List<Header> prepare_headers(Map<String, Object> defaultHeaders) {
+        List<Header> res = new ArrayList<>();
+
+        for (Map.Entry<String, Object> ent : defaultHeaders.entrySet()) {
+            Header hder = new BasicHeader(ent.getKey(), ent.getValue().toString());
+            res.add(hder);
+        }
+        return res;
+    }
+
+    private static HttpClient prepare_client(String base_url, Map<String, Object> default_headers)
     {
-        this.client = client;
+        HttpClientBuilder bclient = HttpClients.custom();
+        bclient.setDefaultHeaders(prepare_headers(default_headers));
+
+        return bclient.build();
+    }
+
+    public RestClientW(String base_url, Map<String, Object> default_headers)
+    {
+    
+        this.client = prepare_client(base_url, default_headers);
         this.base_url = base_url;
         this.default_headers = default_headers;
         this.gson = new Gson();
     }
 
-    private WebResource.Builder fill_headers(WebResource.Builder ress)
+    private URI build_uri_query(String url, Map<String, String> query) throws URISyntaxException
     {
-        for (Map.Entry<String, Object> ent : default_headers.entrySet())
-        {
-            ress = ress.header(ent.getKey(), ent.getValue());
-        }
-        return ress;
-    }
-
-    private WebResource fill_query(WebResource ress, Map<String, String> query)
-    {
+        URIBuilder res = new URIBuilder(url);
         if (query == null)
-            return ress;
+            return res.build();
 
         for (Map.Entry<String, String> ent : query.entrySet())
         {
-            ress = ress.queryParam(ent.getKey(), ent.getValue());
+            res.addParameter(ent.getKey(), ent.getValue());
         }
-        return ress;
+        return res.build();
     }
 
-    private  void check_response(ClientResponse response) throws RiminderResponseException {
-        if (response.getStatusInfo().getStatusCode() >= 300)
+    private  void check_response(HttpResponse response) throws RiminderResponseException {
+        if (response.getStatusLine().getStatusCode() >= 300)
             throw new RiminderResponseException(response);
     }
 
 
-    public Map<String,Token> get(String endpoint) throws RiminderTransferException, RiminderResponseException {
+    public Map<String,Token> get(String endpoint) throws RiminderException {
         return get(endpoint, null);
     }
 
     private  interface ReqExecutor
     {
-        ClientResponse execute();
+        HttpResponse execute() throws IOException;
     }
 
-    private ClientResponse executeRequest(ReqExecutor executor) throws RiminderResponseException, RiminderTransferException {
-        ClientResponse response;
+    private HttpResponse executeRequest(ReqExecutor executor) throws RiminderException {
+        HttpResponse response;
         try
         {
             response = executor.execute();
-        }catch (UniformInterfaceException exp)
+        }catch (IOException exp)
         {
-            throw new RiminderResponseException(exp);
-        }catch (ClientHandlerException exp)
-        {
-            throw new RiminderTransferException("Error while handling request.", exp);
+            throw new RiminderTransferException("Error during request handling!", exp);
         }
         check_response(response);
         return response;
     }
 
-    public Map<String,Token> get(String endpoint, Map<String, String> query) throws RiminderResponseException, RiminderTransferException {
-        WebResource ress = client.resource(this.base_url + endpoint);
-        ress = fill_query(ress, query);
-        WebResource.Builder bress = fill_headers(ress.getRequestBuilder());
 
-        ClientResponse response = executeRequest(() -> { return bress.get(ClientResponse.class); });
+    private String gen_url_final(String endpoint)
+    {
+        return this.base_url + endpoint;
+    }
 
+    public Map<String, Object> response_to_map(HttpResponse response) throws RiminderException
+    {
         Map<String, Object> mapResponse = new HashMap<String, Object>();
-        mapResponse = gson.fromJson(response.getEntity(String.class), mapResponse.getClass());
+        String strBody;
+		try {
+			strBody = EntityUtils.toString(response.getEntity());
+		} catch (ParseException | IOException e) {
+			throw new RiminderRequestException("Cannot create request: ", e);
+		}
 
+        mapResponse = gson.fromJson(strBody, mapResponse.getClass());
+        return mapResponse;
+    }
+
+    public Map<String,Token> get(String endpoint, Map<String, String> query) throws RiminderException {
+
+        String final_url = gen_url_final(endpoint);
+        URI uri;
+        try {
+            uri = build_uri_query(final_url, query);
+        } catch (URISyntaxException e) {
+            throw new RiminderArgumentException(String.format("URI: %s is invalid", final_url), e);
+        }
+
+        HttpGet httpget = new HttpGet(uri);
+        HttpResponse response = executeRequest(() -> { return this.client.execute(httpget); });
+
+        Map<String, Object> mapResponse = response_to_map(response);
         return Token.fromResponse(mapResponse);
     }
 
-    public Map<String, Token> post(String endpoint, Map<String, Object> bodyparams) throws RiminderResponseException, RiminderTransferException {
-        WebResource ress = client.resource(this.base_url + endpoint);
-        WebResource.Builder bress = fill_headers(ress.getRequestBuilder());
+    public Map<String, Token> post(String endpoint, Map<String, Object> bodyparams) throws RiminderException {
+        String final_url = gen_url_final(endpoint);
+        URI uri;
+        try {
+            uri = new URIBuilder(final_url).build();
+        } catch (URISyntaxException e) {
+            throw new RiminderArgumentException(String.format("URI: %s is invalid", final_url), e);
+        }
         
-        Gson gson = new Gson();
-        String jsonbody = gson.toJson(bodyparams);
+        String jsonbody = this.gson.toJson(bodyparams);
 
-        ClientResponse response = executeRequest(() -> {
-            return bress.post(ClientResponse.class, jsonbody);
+        HttpPost httppost = new HttpPost(uri);
+        try {
+            httppost.setEntity(new StringEntity(jsonbody));
+        } catch (UnsupportedEncodingException e) {
+            throw new RiminderRequestException("Cannot create request!", e);
+        }      
+        httppost.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+
+        HttpResponse response = executeRequest(() -> {
+            return this.client.execute(httppost);
         });
 
-        Map<String, Object> mapResponse = new HashMap<String, Object>();
-        mapResponse = gson.fromJson(response.getEntity(String.class), mapResponse.getClass());
-
+        Map<String, Object> mapResponse = response_to_map(response);
         return Token.fromResponse(mapResponse);
     }
 
-    // Todo : Finish it
-    public Map<String, Token> postfile(String endpoint, Map<String, Object> bodyparams, String filepath)
-            throws RiminderResponseException, RiminderTransferException {
-        /*WebResource ress = client.resource(this.base_url + endpoint);
-        WebResource.Builder bress = fill_headers(ress.getRequestBuilder());
+    MultipartEntityBuilder fill_multiparts(MultipartEntityBuilder multbuilder, Map<String, Object> bodyparams)
+    {
+        for (Map.Entry<String, Object> ent : bodyparams.entrySet())
+        {
+            String str_value;
+            str_value = this.gson.toJson(ent.getValue());
 
-        Gson gson = new Gson();
-        String jsonbody = gson.toJson(bodyparams);
+            multbuilder.addTextBody(ent.getKey(), str_value);
+        }
+        return multbuilder;
+    }
 
-        ClientResponse response = executeRequest(() -> {
-            return bress.post(ClientResponse.class, jsonbody);
+    public Map<String, Token> postfile(String endpoint, Map<String, Object> bodyparams, String filepath) throws RiminderException {
+        String final_url = gen_url_final(endpoint);
+        URI uri;
+        try {
+            uri = new URIBuilder(final_url).build();
+        } catch (URISyntaxException e) {
+            throw new RiminderArgumentException(String.format("URI: %s is invalid", final_url), e);
+        }
+
+        File file = new File(filepath);
+        FileEntity filebody = new FileEntity(file);
+
+        HttpPost httppost = new HttpPost(uri);
+        MultipartEntityBuilder multbuilder = MultipartEntityBuilder.create();
+        multbuilder.addBinaryBody("file", file);
+        multbuilder = fill_multiparts(multbuilder, bodyparams);
+        httppost.setEntity(multbuilder.build());
+
+        HttpResponse response = executeRequest(() -> {
+            return this.client.execute(httppost);
         });
 
-        Map<String, Object> mapResponse = new HashMap<String, Object>();
-        mapResponse = gson.fromJson(response.getEntity(String.class), mapResponse.getClass());
-        */
-        return Token.fromResponse(null/*mapResponse*/);
+        Map<String, Object> mapResponse = response_to_map(response);
+        return Token.fromResponse(mapResponse);
     }
 
 
-    public Map<String, Token> patch(String endpoint, Map<String, Object> bodyparams, String filepath)
-            throws RiminderResponseException, RiminderTransferException {
-        WebResource ress = client.resource(this.base_url + endpoint);
-        WebResource.Builder bress = fill_headers(ress.getRequestBuilder());
+    public Map<String, Token> patch(String endpoint, Map<String, Object> bodyparams) throws RiminderException {
+        String final_url = gen_url_final(endpoint);
+        URI uri;
+		try {
+			uri = new URIBuilder(final_url).build();
+		} catch (URISyntaxException e) {
+			throw new RiminderArgumentException(String.format("URI: %s is invalid", final_url), e);
+		}
 
-        Gson gson = new Gson();
-        String jsonbody = gson.toJson(bodyparams);
+        String jsonbody = this.gson.toJson(bodyparams);
 
-        ClientResponse response = executeRequest(() -> {
-            return bress.method("PATCH", ClientResponse.class, jsonbody);
+        HttpPatch httppatch = new HttpPatch(uri);
+        try {
+			httppatch.setEntity(new StringEntity(jsonbody));
+		} catch (UnsupportedEncodingException e) {
+			throw new RiminderRequestException("Cannot create request!", e);
+		}
+        httppatch.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+
+        HttpResponse response = executeRequest(() -> {
+            return this.client.execute(httppatch);
         });
 
-        Map<String, Object> mapResponse = new HashMap<String, Object>();
-        mapResponse = gson.fromJson(response.getEntity(String.class), mapResponse.getClass());
-
+        Map<String, Object> mapResponse = response_to_map(response);
         return Token.fromResponse(mapResponse);
+    }
+
+    public static Map<String, Object> add_with_default(Map<String, Object> map, String key, Object value, Object def) {
+        return add_with_default(map, key, value, def, true);
     }
 
     public static Map<String, String> add_with_default(Map<String, String> map, String key, String value, String def) {
@@ -168,6 +269,17 @@ public class RestClientW {
             map.put(key, value);
         else if (def != null)
             map.put(key, def);
+        else if (acceptnull)
+            map.put(key, null);
+        return map;
+    }
+
+    public static Map<String, String> add_with_defaultso(Map<String, String> map, String key, Object value, Object def,
+            Boolean acceptnull) {
+        if (value != null)
+            map.put(key, value.toString());
+        else if (def != null)
+            map.put(key, def.toString());
         else if (acceptnull)
             map.put(key, null);
         return map;

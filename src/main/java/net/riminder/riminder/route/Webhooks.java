@@ -75,7 +75,7 @@ public class Webhooks {
         public void handle(String eventName, Map<String, Token> token);
     }
 
-    public Map<String,Token> check() throws RiminderResponseCastException, RiminderTransferException, RiminderResponseException {
+    public Map<String,Token> check() throws RiminderException {
         return rclient.get("webhook/check").get("data").getAsMap();
     }
 

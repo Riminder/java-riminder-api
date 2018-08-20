@@ -6,6 +6,7 @@ import java.util.Map;
 
 import net.riminder.riminder.Ident;
 import net.riminder.riminder.RestClientW;
+import net.riminder.riminder.exp.RiminderException;
 import net.riminder.riminder.exp.RiminderResponseCastException;
 import net.riminder.riminder.exp.RiminderResponseException;
 import net.riminder.riminder.exp.RiminderTransferException;
@@ -20,12 +21,12 @@ public class Filter {
         this.rclient = rclient;
     }
 
-    public List<Token> list() throws RiminderResponseCastException, RiminderTransferException, RiminderResponseException
+    public List<Token> list() throws RiminderException
     {
         return rclient.get("filters").get("data").getAsList();
     }
 
-    public Map<String, Token> get(Ident filter_ident) throws RiminderResponseCastException, RiminderResponseException, RiminderTransferException
+    public Map<String, Token> get(Ident filter_ident) throws RiminderException
     {
         Map<String, String> query = new HashMap<>();
         query.put(filter_ident.getName(), filter_ident.getValue());
