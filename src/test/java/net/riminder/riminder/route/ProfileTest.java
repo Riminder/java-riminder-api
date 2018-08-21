@@ -305,28 +305,26 @@ public class ProfileTest
     {
         TestHelper tHelper = TestHelper.getInstance(); 
 
-        tHelper.getApi().Profile().Stage().set(tHelper.getSourceID(), 
+        tHelper.getApi().Profile().Stage().set(tHelper.getSourceID(), Constants.Stage.NO,
             new Ident.ID(Ident.Profile, tHelper.getProfileID()), 
-            new Ident.ID(Ident.Filter, tHelper.getFilterID()), 
-            Constants.Stage.NO);
+            new Ident.ID(Ident.Filter, tHelper.getFilterID()));
     }
     
     public void setStagerefTest() throws RiminderException, Exception {
         TestHelper tHelper = TestHelper.getInstance();
 
-        tHelper.getApi().Profile().Stage().set(tHelper.getSourceID(),
+        tHelper.getApi().Profile().Stage().set(tHelper.getSourceID(),  Constants.Stage.NO,
                 new Ident.Reference(Ident.Profile, tHelper.getFilterRef()), 
-                new Ident.Reference(Ident.Filter, tHelper.getFilterRef()),
-                Constants.Stage.NO);
+                new Ident.Reference(Ident.Filter, tHelper.getFilterRef()));
     }
 
     public void setStagebadTest() throws RiminderException, Exception {
         TestHelper tHelper = TestHelper.getInstance();
 
         try{
-            tHelper.getApi().Profile().Stage().set("tHelper.getSourceID()",
+            tHelper.getApi().Profile().Stage().set("tHelper.getSourceID()", Constants.Stage.NO,
                     new Ident.Reference(Ident.Profile, " tHelper.getFilterRef()"),
-                    new Ident.Reference(Ident.Filter, "tHelper.getFilterRef()"), Constants.Stage.NO);
+                    new Ident.Reference(Ident.Filter, "tHelper.getFilterRef()"));
 
         }catch (RiminderException e)
         {
@@ -338,26 +336,25 @@ public class ProfileTest
     public void setRatingidTest() throws RiminderException, Exception {
         TestHelper tHelper = TestHelper.getInstance();
 
-        tHelper.getApi().Profile().Rating().set(tHelper.getSourceID(),
-                new Ident.ID(Ident.Profile, tHelper.getProfileID()), new Ident.ID(Ident.Filter, tHelper.getFilterID()),
-                1);
+        tHelper.getApi().Profile().Rating().set(tHelper.getSourceID(), 1,
+                new Ident.ID(Ident.Profile, tHelper.getProfileID()), new Ident.ID(Ident.Filter, tHelper.getFilterID()));
     }
 
     public void setRatingrefTest() throws RiminderException, Exception {
         TestHelper tHelper = TestHelper.getInstance();
 
-        tHelper.getApi().Profile().Rating().set(tHelper.getSourceID(),
+        tHelper.getApi().Profile().Rating().set(tHelper.getSourceID(), 1,
                 new Ident.Reference(Ident.Profile, tHelper.getFilterRef()),
-                new Ident.Reference(Ident.Filter, tHelper.getFilterRef()), 1);
+                new Ident.Reference(Ident.Filter, tHelper.getFilterRef()));
     }
 
     public void setRatingbadTest() throws RiminderException, Exception {
         TestHelper tHelper = TestHelper.getInstance();
 
         try {
-            tHelper.getApi().Profile().Rating().set("tHelper.getSourceID()",
+            tHelper.getApi().Profile().Rating().set("tHelper.getSourceID()", 1,
                     new Ident.Reference(Ident.Profile, " tHelper.getFilterRef()"),
-                    new Ident.Reference(Ident.Filter, "tHelper.getFilterRef()"), 1);
+                    new Ident.Reference(Ident.Filter, "tHelper.getFilterRef()"));
 
         } catch (RiminderException e) {
             return;

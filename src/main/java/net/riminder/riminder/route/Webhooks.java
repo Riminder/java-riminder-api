@@ -68,11 +68,9 @@ public class Webhooks {
 
     }
 
-
-
     public static interface MessageHandler
     {
-        public void handle(String eventName, Map<String, Token> token);
+        public void handle(String eventName, Map<String, Token> webhook_data);
     }
 
     public Map<String,Token> check() throws RiminderException {
@@ -110,11 +108,7 @@ public class Webhooks {
     private String base64Deecode(String input) throws RiminderWebhookException
     {
         byte[] byte_input = Base64.getDecoder().decode(input);
-        // try {
-			return new String(byte_input);
-		// } catch (UnsupportedEncodingException e) {
-            // throw new RiminderWebhookException("Cannot decode webhook message.", e); 
-		// }
+	    return new String(byte_input);
     }
 
     private String customStrStr(String input, String to_change, String to)

@@ -302,7 +302,7 @@ public class Profile {
             this.rclient = rclient;
         }
 
-        public Map<String, Token> set(String source_id, Ident profile_ident, Ident filter_ident, String stage) throws RiminderException
+        public Map<String, Token> set(String source_id, String stage, Ident profile_ident, Ident filter_ident) throws RiminderException
         {
             Map<String, Object> bodyparams = new HashMap<>();
 
@@ -322,7 +322,7 @@ public class Profile {
             this.rclient = rclient;
         }
 
-        public Map<String, Token> set(String source_id, Ident profile_ident, Ident filter_ident, int rating) throws RiminderException {
+        public Map<String, Token> set(String source_id, int rating, Ident profile_ident, Ident filter_ident) throws RiminderException {
             Map<String, Object> bodyparams = new HashMap<>();
 
             bodyparams.put("source_id", source_id);
