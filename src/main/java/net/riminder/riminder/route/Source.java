@@ -21,7 +21,7 @@ public class Source {
     }
 
     public List<Token> list() throws RiminderException {
-        return rclient.get("sources").get("data").getAsList();
+        return rclient.get("sources").get("data").asList();
     }
 
     public Map<String, Token> get(String source_id) throws RiminderException {
@@ -29,7 +29,7 @@ public class Source {
         Map<String, String> query = new HashMap<>();
         query.put("source_id", source_id);
 
-        return rclient.get("source", query).get("data").getAsMap();
+        return rclient.get("source", query).get("data").asMap();
     }
 }
 

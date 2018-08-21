@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RestClientW {
 
@@ -157,15 +159,18 @@ public class RestClientW {
             throw new RiminderArgumentException(String.format("URI: %s is invalid", final_url), e);
         }
         
-        String jsonbody = this.gson.toJson(bodyparams);
-
         HttpPost httppost = new HttpPost(uri);
-        try {
-            httppost.setEntity(new StringEntity(jsonbody));
-        } catch (UnsupportedEncodingException e) {
-            throw new RiminderRequestException("Cannot create request!", e);
-        }      
-        httppost.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+        if (bodyparams != null)
+        {
+            String jsonbody = this.gson.toJson(bodyparams);
+    
+            try {
+                httppost.setEntity(new StringEntity(jsonbody));
+            } catch (UnsupportedEncodingException e) {
+                throw new RiminderRequestException("Cannot create request!", e);
+            }      
+            httppost.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+        }
 
         HttpResponse response = executeRequest(() -> {
             return this.client.execute(httppost);
@@ -177,10 +182,16 @@ public class RestClientW {
 
     MultipartEntityBuilder fill_multiparts(MultipartEntityBuilder multbuilder, Map<String, Object> bodyparams)
     {
+        Pattern pattern = Pattern.compile("^\".*\"$");
         for (Map.Entry<String, Object> ent : bodyparams.entrySet())
         {
             String str_value;
             str_value = this.gson.toJson(ent.getValue());
+            Matcher matcher = pattern.matcher(str_value);
+            if (matcher.find())
+            {
+                str_value = str_value.substring(1, str_value.length()-1);
+            }
 
             multbuilder.addTextBody(ent.getKey(), str_value);
         }

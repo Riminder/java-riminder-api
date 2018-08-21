@@ -23,7 +23,7 @@ public class Token {
         return value.toString();
     }
 
-    public <T> T getAs() throws RiminderResponseCastException
+    public <T> T as() throws RiminderResponseCastException
     {
         try
         {
@@ -34,14 +34,14 @@ public class Token {
         }
     }
 
-    public Map<String, Token> getAsMap() throws RiminderResponseCastException
+    public Map<String, Token> asMap() throws RiminderResponseCastException
     {
-        return this.getAs();
+        return this.as();
     }
 
-    public List<Token> getAsList() throws RiminderResponseCastException
+    public List<Token> asList() throws RiminderResponseCastException
     {
-        return this.getAs();
+        return this.as();
     }
 
     private static Token responseValueToToken(Object obj)
@@ -75,6 +75,8 @@ public class Token {
 
     public static Map<String, Token> fromResponse(Map<String, Object> input)
     {
+        if (input == null)
+            return null;
         return responseMapToTokenMap(input);
     }
 }

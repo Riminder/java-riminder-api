@@ -23,7 +23,7 @@ public class Filter {
 
     public List<Token> list() throws RiminderException
     {
-        return rclient.get("filters").get("data").getAsList();
+        return rclient.get("filters").get("data").asList();
     }
 
     public Map<String, Token> get(Ident filter_ident) throws RiminderException
@@ -31,7 +31,7 @@ public class Filter {
         Map<String, String> query = new HashMap<>();
         query.put(filter_ident.getName(), filter_ident.getValue());
 
-        return rclient.get("filter", query).get("data").getAsMap();
+        return rclient.get("filter", query).get("data").asMap();
     }
 
 }

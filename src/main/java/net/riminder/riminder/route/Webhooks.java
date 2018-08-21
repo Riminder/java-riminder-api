@@ -1,6 +1,7 @@
 package net.riminder.riminder.route;
 
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -8,15 +9,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import com.google.gson.Gson;
 
 import net.riminder.riminder.RestClientW;
 import net.riminder.riminder.exp.RiminderArgumentException;
 import net.riminder.riminder.exp.RiminderException;
-import net.riminder.riminder.exp.RiminderResponseCastException;
-import net.riminder.riminder.exp.RiminderResponseException;
-import net.riminder.riminder.exp.RiminderTransferException;
 import net.riminder.riminder.exp.RiminderWebhookException;
 import net.riminder.riminder.response.Token;
 
@@ -76,7 +76,7 @@ public class Webhooks {
     }
 
     public Map<String,Token> check() throws RiminderException {
-        return rclient.get("webhook/check").get("data").getAsMap();
+        return rclient.post("webhook/check", null).get("data").asMap();
     }
 
     public void setHandler(String eventName, MessageHandler handler) throws RiminderArgumentException
@@ -110,11 +110,11 @@ public class Webhooks {
     private String base64Deecode(String input) throws RiminderWebhookException
     {
         byte[] byte_input = Base64.getDecoder().decode(input);
-        try {
-			return new String(byte_input, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-            throw new RiminderWebhookException("Cannot decode webhook message.", e); 
-		}
+        // try {
+			return new String(byte_input);
+		// } catch (UnsupportedEncodingException e) {
+            // throw new RiminderWebhookException("Cannot decode webhook message.", e); 
+		// }
     }
 
     private String customStrStr(String input, String to_change, String to)
@@ -142,19 +142,22 @@ public class Webhooks {
         return base64Deecode(customStrStr(input, "-_", "+/"));
     }
 
-    private Boolean isSignatureValid(String payload, String sign)
+    private Boolean isSignatureValid(String payload, String sign) throws RiminderWebhookException
     {
-        MessageDigest hasher;
-		try {
-			hasher = MessageDigest.getInstance("SHA-256");
-		} catch (NoSuchAlgorithmException e) {
-			return false;
+        byte[] expected_sign_byte = null;
+        try {
+            Mac hasher = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secret_key = new SecretKeySpec(webhooksecret.getBytes(), "HmacSHA256");
+			hasher.init(secret_key);
+            expected_sign_byte = hasher.doFinal(payload.getBytes());
+
+		} catch (InvalidKeyException | NoSuchAlgorithmException e) {
+			throw new RiminderWebhookException("Can't decode webhook event.", e);
 		}
 
-        byte[] expected_sign_byte = hasher.digest(payload.getBytes());
-        byte[] sign_byte = sign.getBytes();
+        String expected_sign = new String(expected_sign_byte);
 
-        return expected_sign_byte.equals(sign_byte);
+        return expected_sign.equals(sign);
     }
 
     public void handle(String signatureHeader) throws RiminderWebhookException

@@ -132,7 +132,7 @@ public class Profile {
         query = RestClientW.add_with_default(query, "sort_by", options.sort_by, Constants.SortBy.RANKING, false);
         query = RestClientW.add_with_default(query, "order_by", options.order_by, null, false);
 
-        return rclient.get("profiles", query).get("data").getAsMap();
+        return rclient.get("profiles", query).get("data").asMap();
     }
 
     public Map<String, Token> add(String source_id, String filepath, String profile_reference, Long timestamp_reception, List<TrainingMetadata> training_metadatas) throws RiminderException
@@ -144,7 +144,7 @@ public class Profile {
         bodyparams = RestClientW.add_with_default(bodyparams, "training_metadata", training_metadatas, null, false);
         bodyparams = RestClientW.add_with_default(bodyparams, "profile_reference", profile_reference, null, false);
 
-        return rclient.postfile("profile", bodyparams, filepath).get("data").getAsMap();
+        return rclient.postfile("profile", bodyparams, filepath).get("data").asMap();
     }
 
     public Map<String, Token> get(String source_id, Ident profile_ident) throws RiminderException
@@ -154,7 +154,7 @@ public class Profile {
         query.put("source_id", source_id);
         query.put(profile_ident.getName(), profile_ident.getValue());
 
-        return rclient.get("profile", query).get("data").getAsMap();
+        return rclient.get("profile", query).get("data").asMap();
     }
 
     static public class Document
@@ -173,7 +173,7 @@ public class Profile {
             query.put("source_id", source_id);
             query.put(profile_ident.getName(), profile_ident.getValue());
 
-            return rclient.get("profile/documents", query).get("data").getAsList();
+            return rclient.get("profile/documents", query).get("data").asList();
         }
     }
 
@@ -190,7 +190,7 @@ public class Profile {
             query.put("source_id", source_id);
             query.put(profile_ident.getName(), profile_ident.getValue());
 
-            return rclient.get("profile/parsing", query).get("data").getAsMap();
+            return rclient.get("profile/parsing", query).get("data").asMap();
         }
     }
 
@@ -207,7 +207,7 @@ public class Profile {
             query.put("source_id", source_id);
             query.put(profile_ident.getName(), profile_ident.getValue());
 
-            return rclient.get("profile/scoring", query).get("data").getAsList();
+            return rclient.get("profile/scoring", query).get("data").asList();
         }
     }
 
@@ -278,7 +278,7 @@ public class Profile {
             bodyparams.put("profile_json", profile_data);
             bodyparams = RestClientW.add_with_default(bodyparams, "training_metadata", training_metadatas, null, false);
 
-            return rclient.post("profile/json/check", bodyparams).get("data").getAsMap();
+            return rclient.post("profile/json/check", bodyparams).get("data").asMap();
         }
 
         public Map<String, Token> add(String source_id, ProfileJson profile_data, String profile_reference, Long timestamp_reception, List<TrainingMetadata> training_metadatas) throws RiminderException {
@@ -290,7 +290,7 @@ public class Profile {
             bodyparams = RestClientW.add_with_default(bodyparams, "training_metadata", training_metadatas, null, false);
             bodyparams = RestClientW.add_with_default(bodyparams, "profile_reference", profile_reference, null, false);
 
-            return rclient.post("profile/json", bodyparams).get("data").getAsMap();
+            return rclient.post("profile/json", bodyparams).get("data").asMap();
         }
     }
 
@@ -311,7 +311,7 @@ public class Profile {
             bodyparams.put(filter_ident.getName(), filter_ident.getValue());
             bodyparams.put("stage", stage);
 
-            return rclient.patch("profile/stage", bodyparams).get("data").getAsMap();
+            return rclient.patch("profile/stage", bodyparams).get("data").asMap();
         }
     }
 
@@ -330,7 +330,7 @@ public class Profile {
             bodyparams.put(filter_ident.getName(), filter_ident.getValue());
             bodyparams.put("rating", rating);
 
-            return rclient.patch("profile/rating", bodyparams).get("data").getAsMap();
+            return rclient.patch("profile/rating", bodyparams).get("data").asMap();
         }
     }
 
