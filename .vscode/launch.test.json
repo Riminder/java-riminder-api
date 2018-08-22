@@ -1,0 +1,30 @@
+{
+    "run": {
+        "default": "",
+        "items": [
+            {
+                "name": "riminder",
+                "projectName": "riminder",
+                "workingDirectory": "/home/alexandre/code/rimindapi/java/java-riminder-api",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    },
+    "debug": {
+        "default": "",
+        "items": [
+            {
+                "name": "riminder",
+                "projectName": "riminder",
+                "workingDirectory": "/home/alexandre/code/rimindapi/java/java-riminder-api",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    }
+}
