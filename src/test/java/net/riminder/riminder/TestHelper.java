@@ -35,7 +35,7 @@ public class TestHelper
         this.source_name = "sdk_test";
         this.webhook_secret = "lalallaalalala";
         this.api = new Riminder(this.secret_key, this.webhook_secret);
-        this.cv_path = "/home/alexandre/Documents/cv_test09.png";
+        this.cv_path = "/home/xalrandion/code/boite/riminder/java-riminder-api/cv_test1.jpg";
         this.source_id = "fe6d7a2aa9125259a5ecf7905154a0396a891c06";
     }
 
