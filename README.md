@@ -4,9 +4,14 @@
 
 A java api client for riminder api.
 
-## Instalation with nuget
-```shell
- 
+## Instalation with maven
+Put the following in your pom.xml
+```xml
+ <dependency>
+  <groupId>net.riminder.riminder</groupId>
+  <artifactId>riminder</artifactId>
+  <version>0.0.2</version>
+</dependency>
 ```
 
 ## Authentification
@@ -34,8 +39,8 @@ Riminder client = new Riminder("some-key");
 Map<String, Token> profile = client.Profile().get("source_id", new Ident.Reference(Ident.Profile, "reference_for_a_profile"));
 
 // And print his name !
-Console.WriteLine("This profile name is: ");
-Console.WriteLine(profile.get("name").as<String>());
+System.out.println("This profile name is: ");
+System.out.println(profile.get("name").as<String>());
 ```
 
 ## Token
