@@ -28,6 +28,7 @@ public class Profile {
     private Parsing parsing;
     private Scoring scoring;
     private Json json;
+    private Reveal reveal;
 
     // 08/17/2012
     private static final String DEFAULT_DATE_START = "1345208382";
@@ -41,6 +42,7 @@ public class Profile {
         this.parsing = new Parsing(this.rclient);
         this.scoring = new Scoring(this.rclient);
         this.json = new Json(this.rclient);
+        this.reveal = new Reveal(this.client);
     }
 
     public Stage Stage()
@@ -71,6 +73,11 @@ public class Profile {
     public Json Json()
     {
         return this.json;
+    }
+
+    public Reveal Reveal()
+    {
+        return this.reveal;
     }
 
     static public class TrainingMetadata {
@@ -331,6 +338,24 @@ public class Profile {
             bodyparams.put("rating", rating);
 
             return rclient.patch("profile/rating", bodyparams).get("data").asMap();
+        }
+    }
+
+    static public class Reveal {
+        private RestClientW rclient;
+
+        public Reveal(RestClientW rclient) {
+            this.rclient = rclient;
+        }
+
+        public Map<String, Token> set(String source_id, Ident profile_ident, Ident filter_ident) throws RiminderException {
+            Map<String, Object> query = new HashMap<>();
+
+            query.put("source_id", source_id);
+            query.put(profile_ident.getName(), profile_ident.getValue());
+            query.put(filter_ident.getName(), filter_ident.getValue());
+
+            return rclient.get("profile/interpretability", query).get("data").asMap();
         }
     }
 
