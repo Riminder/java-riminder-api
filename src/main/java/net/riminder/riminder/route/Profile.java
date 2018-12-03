@@ -42,7 +42,7 @@ public class Profile {
         this.parsing = new Parsing(this.rclient);
         this.scoring = new Scoring(this.rclient);
         this.json = new Json(this.rclient);
-        this.reveal = new Reveal(this.client);
+        this.reveal = new Reveal(this.rclient);
     }
 
     public Stage Stage()
@@ -348,8 +348,8 @@ public class Profile {
             this.rclient = rclient;
         }
 
-        public Map<String, Token> set(String source_id, Ident profile_ident, Ident filter_ident) throws RiminderException {
-            Map<String, Object> query = new HashMap<>();
+        public Map<String, Token> get(String source_id, Ident profile_ident, Ident filter_ident) throws RiminderException {
+            Map<String, String> query = new HashMap<>();
 
             query.put("source_id", source_id);
             query.put(profile_ident.getName(), profile_ident.getValue());

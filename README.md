@@ -15,7 +15,7 @@ Put the following in your pom.xml
 ```
 
 ## Authentification
-To authenticate against the api, get your API SECRET KEY from your riminder dashboard: 
+To authenticate against the api, get your API SECRET KEY from your riminder dashboard:
 ![findApiSecret](./secretLocation.png)
 
 Then create a new `Riminder` object with this key:
@@ -104,7 +104,7 @@ More details about filters are available [here](https://developers.Riminder.net/
 
 * Retrieve the profiles information associated with specified source ids.
     * listOptions type is `net.riminder.riminder.route.Profile.Listoptions`
-        * a filled `source_ids` is requiered. 
+        * a filled `source_ids` is required.
 
 ```java
 Map<String, Token> resp = client.Profile().list(listOptions);
@@ -129,7 +129,7 @@ Listoptions class:
 ```
 
 * Add a new profile to a source on the platform.
-    * `source_id` and `file_path` are *requiered*
+    * `source_id` and `file_path` are *required*
     * `file_path` is the path to the file to be uploaded.
     * `training_metadatas` type is `List<TrainingMetadata>`
 
@@ -157,14 +157,19 @@ Map<String, Token> resp = client.Profile().Parsing().get(source_id, profile_iden
 List<Token> resp = client.Profile().Scoring().list(source_id, profile_ident);
 ```
 
-* Set stage of a specific profile for a spcified filter.
-    * `stage` is requiered.
+* Reveal interpretability result of a specific profile with a specific filter.
+```java
+Map<String, Token> resp = client.Profile().Reveal().get(source_id, profile_ident, filter_ident);
+```
+
+* Set stage of a specific profile for a specified filter.
+    * `stage` is required.
 ```java
 Map<String, Token> resp = client.Profile().Stage().set(source_id, stage, profile_id, profile_reference, filter_id, filter_reference);
 ```
 
-* Set rating of a specific profile for a spcified filter.
-    * `rating` (`int`) is requiered.
+* Set rating of a specific profile for a specified filter.
+    * `rating` (`int`) is required.
 ```java
 Map<String, Token> resp = client.Profile().Stage().set(source_id, rating, profile_id, profile_reference, filter_id, filter_reference);
 ```
@@ -208,8 +213,8 @@ Webhooks methods permit you handle webhook events.
 Map<String, Token> resp = client.Webhooks().check();
 ```
 * Set an handler for a specified webhook event.
-    * `handler` type is `net.riminder.riminder.route.Webhooks.MessageHandler` 
-        * data received by the webhook are store in `webhook_data`. 
+    * `handler` type is `net.riminder.riminder.route.Webhooks.MessageHandler`
+        * data received by the webhook are store in `webhook_data`.
         * `webhook_data` is a `Map<String, Token>`.
         * `eventName` is `type` field of the webhook.
 
@@ -237,7 +242,7 @@ client.Webhooks().removeHandler(eventName);
 ```java
 client.Webhooks().handle(headers, signatureHeader)
 ```
-Example: 
+Example:
 ```java
 import net.riminder.riminder.Riminder;
 import net.riminder.riminder.response.Token;
@@ -251,13 +256,13 @@ public class Example
 
         // Define an handler
         MessageHandler handler = new MessageHandler(){
-        
+
             @Override
             public void handle(String eventName, Map<String, Token> webhook_data) {
                 // some treatment
             }
         };
-        
+
 
         // Set the handler for an event
         client.Webhooks().setHandler(Webhooks.EventNames.PROFILE_PARSE_SUCCESS, handler);
@@ -283,4 +288,4 @@ Some tests are available. To run them follow these steps:
 ## Help and documentation
 If you need some more details about the api methods and routes see [Riminder API Docs](https://developers.Riminder.net/v1.0/reference).
 
-If you need further explainations about how the api works see [Riminder API Overview](https://developers.riminder.net/v1.0/docs/website-api-overview) 
+If you need further explainations about how the api works see [Riminder API Overview](https://developers.riminder.net/v1.0/docs/website-api-overview)
