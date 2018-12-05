@@ -159,7 +159,7 @@ List<Token> resp = client.Profile().Scoring().list(source_id, profile_ident);
 
 * Reveal interpretability result of a specific profile with a specific filter.
 ```java
-Map<String, Token> resp = client.Profile().Reveal().get(source_id, profile_ident, filter_ident);
+Map<String, Token> resp = client.Profile().Revealing().get(source_id, profile_ident, filter_ident);
 ```
 
 * Set stage of a specific profile for a specified filter.
